@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>결함 관리대장 (작성 예시)</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: "Malgun Gothic", "맑은 고딕", sans-serif; color: #1f1f1f; margin: 0; padding: 24px; background: #ececec; }
+  .sheet { background: #fff; max-width: 900px; margin: 0 auto; padding: 34px 38px 44px; border: 1px solid #c4c4c4; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  h1 { text-align: center; font-size: 23px; letter-spacing: 10px; margin: 0 0 6px; }
+  .subtitle { text-align: center; color: #5f5f5f; font-size: 12px; margin-bottom: 22px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { border: 1px solid #8c8c8c; padding: 7px 9px; vertical-align: top; line-height: 1.55; }
+  th { background: #ededed; font-weight: 600; text-align: center; white-space: nowrap; }
+  .meta th { width: 88px; }
+  .label { background: #f4f4f4; font-weight: 600; width: 150px; text-align: center; }
+  .sec { font-size: 14px; font-weight: 700; margin: 26px 0 8px; border-left: 4px solid #3a3a3a; padding-left: 9px; }
+  .list td { text-align: center; }
+  .list td.l { text-align: left; }
+  .detail { margin-bottom: 16px; }
+  code { font-family: Consolas, "D2Coding", monospace; font-size: 12px; background: #f5f5f5; padding: 1px 4px; border-radius: 3px; }
+  .sev-crit { color: #b00020; font-weight: 700; }
+  .sev-high { color: #c25e00; font-weight: 700; }
+  .note { font-size: 11px; color: #777; margin-top: 6px; }
+  .sign { margin-top: 28px; width: 320px; margin-left: auto; }
+  .sign th { width: 80px; }
+  .sign td { height: 40px; }
+  @media print { body { background: #fff; padding: 0; } .sheet { border: none; box-shadow: none; } }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <h1>결 함 관 리 대 장</h1>
+  <div class="subtitle">NCS 애플리케이션 테스트 수행 (2001020227_23v6) &nbsp;|&nbsp; 과제 : S-Library 도서 대출 &nbsp;|&nbsp; 〔작성 예시〕</div>
+
+  <table class="meta">
+    <tr>
+      <th>과 제 명</th><td>S-Library 도서 대출</td>
+      <th>작 성 자</th><td>홍길동</td>
+      <th>작 성 일</th><td>2026-06-24</td>
+    </tr>
+    <tr>
+      <th>대상 모듈</th><td>LibraryServiceImpl</td>
+      <th>검 토 자</th><td>정우균</td>
+      <th>페 이 지</th><td>1 / 1</td>
+    </tr>
+  </table>
+
+  <div class="sec">1. 결함 목록</div>
+  <table class="list">
+    <thead>
+      <tr>
+        <th style="width:70px;">결함 ID</th>
+        <th>발견 테스트</th>
+        <th style="width:140px;">결함 유형</th>
+        <th style="width:70px;">심각도</th>
+        <th style="width:70px;">우선순위</th>
+        <th style="width:90px;">상태</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>D-01</td><td class="l">lend_재고0_예외</td><td>논리 오류(경계조건)</td><td class="sev-high">High</td><td>High</td><td>open → fixed</td></tr>
+      <tr><td>D-02</td><td class="l">lend_미존재도서_예외</td><td>예외처리 누락(Null)</td><td class="sev-crit">Critical</td><td>High</td><td>open → fixed</td></tr>
+      <tr><td>D-03</td><td class="l">returnBook_중복반납_차단</td><td>검증 누락(상태검사)</td><td class="sev-high">High</td><td>Medium</td><td>open → fixed</td></tr>
+      <tr><td>D-04</td><td class="l">isOverdue_경계</td><td>논리 오류(경계조건)</td><td>Medium</td><td>Low</td><td>open → fixed</td></tr>
+    </tbody>
+  </table>
+  <div class="note">※ 심각도(severity) = 결함이 미치는 영향의 정도 &nbsp;/&nbsp; 우선순위(priority) = 수정의 긴급도 (서로 다른 속성)</div>
+
+  <div class="sec">2. 결함 상세</div>
+
+  <table class="detail">
+    <tr><th class="label">결함 ID</th><td style="width:30%;">D-01</td><th class="label">발견 테스트</th><td>LendServiceTest.lend_재고0_예외</td></tr>
+    <tr><th class="label">제목</th><td colspan="3">대출 가능 재고가 0 일 때도 대출이 진행되어 재고가 음수가 됨</td></tr>
+    <tr><th class="label">재현 절차</th><td colspan="3">availableCopies = 0 인 도서로 <code>lend(bookId, member)</code> 를 호출한다.</td></tr>
+    <tr><th class="label">기대 결과</th><td colspan="3">BizException("대출 가능한 재고가 없습니다.") 발생</td></tr>
+    <tr><th class="label">실제 결과</th><td colspan="3">예외 없이 대출이 진행되고 availableCopies 가 -1 이 됨</td></tr>
+    <tr><th class="label">결함 위치<br>(파일 · 메서드 · 라인)</th><td colspan="3"><code>LibraryServiceImpl.java : lend() : 34행</code> &nbsp; <code>if (book.getAvailableCopies() &lt; 0)</code> (경계 조건이 &lt;= 0 이어야 함)</td></tr>
+    <tr><th class="label">유형 / 심각도 / 우선순위</th><td colspan="3">논리 오류(경계조건) / High / High</td></tr>
+  </table>
+
+  <table class="detail">
+    <tr><th class="label">결함 ID</th><td style="width:30%;">D-02</td><th class="label">발견 테스트</th><td>LendServiceTest.lend_미존재도서_예외</td></tr>
+    <tr><th class="label">제목</th><td colspan="3">존재하지 않는 도서 대출 시 BizException 이 아니라 NullPointerException(서버 오류) 발생</td></tr>
+    <tr><th class="label">재현 절차</th><td colspan="3">존재하지 않는 bookId(예: 99)로 <code>lend()</code> 를 호출한다.</td></tr>
+    <tr><th class="label">기대 결과</th><td colspan="3">BizException("존재하지 않는 도서입니다.") 발생</td></tr>
+    <tr><th class="label">실제 결과</th><td colspan="3">book 이 null 이라 34행에서 NullPointerException 발생</td></tr>
+    <tr><th class="label">결함 위치<br>(파일 · 메서드 · 라인)</th><td colspan="3"><code>LibraryServiceImpl.java : lend() : 31행</code> <code>findById(bookId).orElse(null)</code> → 34행에서 NPE</td></tr>
+    <tr><th class="label">유형 / 심각도 / 우선순위</th><td colspan="3">예외처리 누락(Null) / Critical / High</td></tr>
+  </table>
+
+  <table class="detail">
+    <tr><th class="label">결함 ID</th><td style="width:30%;">D-03</td><th class="label">발견 테스트</th><td>LendServiceTest.returnBook_중복반납_차단</td></tr>
+    <tr><th class="label">제목</th><td colspan="3">이미 반납된 대출을 다시 반납하면 재고가 중복 증가함</td></tr>
+    <tr><th class="label">재현 절차</th><td colspan="3">대출 → 반납 후, 같은 lendId 로 <code>returnBook()</code> 을 다시 호출한다.</td></tr>
+    <tr><th class="label">기대 결과</th><td colspan="3">두 번째 호출은 BizException("이미 반납된 대출입니다."), 재고는 한 번만 증가</td></tr>
+    <tr><th class="label">실제 결과</th><td colspan="3">예외 없이 진행되어 availableCopies 가 두 번 증가함</td></tr>
+    <tr><th class="label">결함 위치<br>(파일 · 메서드 · 라인)</th><td colspan="3"><code>LibraryServiceImpl.java : returnBook() : 57행</code> (반납 여부 검사 누락 — returnedAt != null 검사 필요)</td></tr>
+    <tr><th class="label">유형 / 심각도 / 우선순위</th><td colspan="3">검증 누락(상태검사) / High / Medium</td></tr>
+  </table>
+
+  <table class="detail">
+    <tr><th class="label">결함 ID</th><td style="width:30%;">D-04</td><th class="label">발견 테스트</th><td>LendServiceTest.isOverdue_경계</td></tr>
+    <tr><th class="label">제목</th><td colspan="3">반납기한 당일(동일 시각)을 연체로 잘못 판정함 (경계 1일 오차)</td></tr>
+    <tr><th class="label">재현 절차</th><td colspan="3">dueAt 과 asOf 를 같은 시각으로 하여 <code>isOverdue()</code> 를 호출한다.</td></tr>
+    <tr><th class="label">기대 결과</th><td colspan="3">false (당일은 연체가 아님)</td></tr>
+    <tr><th class="label">실제 결과</th><td colspan="3">true (연체로 판정)</td></tr>
+    <tr><th class="label">결함 위치<br>(파일 · 메서드 · 라인)</th><td colspan="3"><code>LibraryServiceImpl.java : isOverdue() : 75행</code> <code>return !asOf.isBefore(dueAt)</code> (asOf.isAfter(dueAt) 이어야 함)</td></tr>
+    <tr><th class="label">유형 / 심각도 / 우선순위</th><td colspan="3">논리 오류(경계조건) / Medium / Low</td></tr>
+  </table>
+
+  <table class="sign">
+    <tr><th>작성자</th><td>홍길동 (인)</td></tr>
+    <tr><th>검토자</th><td>정우균 (인)</td></tr>
+  </table>
+</div>
+</body>
+</html>
