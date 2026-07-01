@@ -20,18 +20,20 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+// Mockito를 사용하여 모의 객체(Mock) 환경에서 서비스 로직만 분리해 검증
 @ExtendWith(MockitoExtension.class)
 class LendServiceTest {
 
     @Mock
-    private BookRepository bookRepository;
+    private BookRepository bookRepository; // 도서 조회를 위한 모의 리포지토리
 
     @Mock
-    private LendRepository lendRepository;
+    private LendRepository lendRepository; // 대출 기록 저장을 위한 모의 리포지토리
 
     @InjectMocks
-    private LibraryServiceImpl service;
+    private LibraryServiceImpl service; // 모의 객체들이 주입된 실제 테스트 대상 서비스
 
+    // 테스트용 도서(Book) 객체를 빠르게 생성하기 위한 메서드
     private Book stockBook(Long id, int available) {
         Book b = new Book();
         b.setId(id);
@@ -39,9 +41,11 @@ class LendServiceTest {
         return b;
     }
 
+    // 도서 정상 대출 시 재고 감소 및 반납기한 설정 테스트 추가
     @Test
     @DisplayName("대출 정상: 재고가 1 줄고 반납기한이 설정된다")
     void lend_정상() {
+        // Given: ID가 1이고 재고가 2권인 도서 데이터와 가짜 리포지토리 행동 정의
         Book book = stockBook(1L, 2);
         book.setTitle("클린 코드");
         book.setIsbn("i-1");
@@ -49,8 +53,10 @@ class LendServiceTest {
         when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
         when(lendRepository.save(any(Lend.class))).thenAnswer(inv -> inv.getArgument(0));
 
+        // When: 대출 로직 실행
         Lend created = service.lend(1L, "kim");
 
+        // Then: 결과 검증 (재고가 1권으로 줄고, 반납 기한이 생겼으며, 대출자가 맞는지 확인)
         assertAll(
                 () -> assertEquals(1, book.getAvailableCopies()),
                 () -> assertNotNull(created.getDueAt()),
