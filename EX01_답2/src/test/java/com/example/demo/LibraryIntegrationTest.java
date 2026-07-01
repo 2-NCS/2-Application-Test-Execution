@@ -48,6 +48,8 @@ class LibraryIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.lendId").exists());
 
+        //perform을 사용하여 Http 요청 실행하며 /api/library/books/로 get 하며 경로 주소를 통해 이용가능 한 bookId의 책이 몇권인지 조회
+        //andExpect으로 응답이 200인지 그리고 availableCopies의 값이 0인지 검증
         mockMvc.perform(get("/api/library/books/" + bookId + "/available"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.availableCopies").value(0));
