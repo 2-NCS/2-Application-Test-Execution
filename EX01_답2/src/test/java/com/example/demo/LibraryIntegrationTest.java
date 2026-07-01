@@ -38,6 +38,10 @@ class LibraryIntegrationTest {
         Long bookId = bookRepository.save(seed).getId();    //생성된 책 객체 DB에 저장후 책 고유번호 Long타입으로 변수에 저장
 
         String lendJson = "{\"bookId\":" + bookId + ",\"member\":\"hong\"}"; //책 대여 테스트를 위한 JSON형태로 이전 저장한 bookId와 hong이라는 이름으로 String 타입에 저장
+
+        //perform을 사용하여 Http 요청 실행하며 /api/library/lend로 post 하여 책 대여
+        //Json타입으로 주고 받으며 바디에 lendJson을 넣어서 보냄
+        //andExpect으로 응답이 200인지 그리고 lendId로 넣은값이 존재하는지 검증
         mockMvc.perform(post("/api/library/lend")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(lendJson))
