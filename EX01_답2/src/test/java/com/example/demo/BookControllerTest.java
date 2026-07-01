@@ -72,9 +72,18 @@ class BookControllerTest {
 
     @Test
     @DisplayName("대출 검증 실패: bookId 누락/member 공백이면 400")
+        // 테스트 리포트에 표시될 이름: bookId가 없거나(null) member가 빈 문자열일 때 400을 반환해야 함을 설명
     void lend_검증실패_400() throws Exception {
+        // 테스트 메서드, MockMvc 수행 중 발생할 수 있는 체크 예외를 던지기 위해 throws Exception 선언
+
         postLend("{\"bookId\":null,\"member\":\"\"}")
+                // 대출 요청 API 호출. bookId를 null로, member를 빈 문자열("")로 채운 잘못된 요청 바디 전송
+                // (Bean Validation 등의 @NotNull, @NotBlank 검증에 걸리도록 의도된 입력값)
+
                 .andExpect(status().isBadRequest());
+        // HTTP 응답 상태 코드가 400(Bad Request)인지 검증
+        // 컨트롤러/DTO에 설정된 검증 어노테이션이 정상 동작하여
+        // 잘못된 입력을 걸러내는지 확인하는 테스트
     }
 
     @Test
