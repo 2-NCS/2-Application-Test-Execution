@@ -88,12 +88,28 @@ class BookControllerTest {
 
     @Test
     @DisplayName("대출 비즈니스 예외: 재고 없음이면 400 + error 메시지")
+        // 테스트 리포트 표시 이름: 재고가 없는 상황(비즈니스 예외)에서 400과 error 메시지를 반환해야 함을 설명
     void lend_재고없음_400() throws Exception {
+        // 테스트 메서드, MockMvc 수행 중 발생할 수 있는 체크 예외를 던지기 위해 throws Exception 선언
+
         when(libraryService.lend(eq(2L), anyString()))
                 .thenThrow(new BizException("대출 가능한 재고가 없습니다."));
+        // libraryService.lend()가 첫 번째 인자로 정확히 2L, 두 번째 인자로 임의의 문자열이 들어올 때
+        // 정상 반환 대신 BizException(비즈니스 예외)을 던지도록 목(mock) 객체의 동작을 정의
+        // (재고 부족 등 도메인 규칙 위반 상황을 시뮬레이션)
 
         postLend("{\"bookId\":2,\"member\":\"kim\"}")
+                // 대출 요청 API 호출. bookId=2, member="kim"으로 요청 바디 전송
+                // (앞서 스터빙한 조건과 일치시켜 BizException이 발생하도록 유도)
+
                 .andExpect(status().isBadRequest())
+                // HTTP 응답 상태 코드가 400(Bad Request)인지 검증
+                // 서비스에서 던진 BizException을 컨트롤러/전역 예외 핸들러(@ExceptionHandler 등)가
+                // 잡아서 400으로 변환하는지 확인
+
                 .andExpect(jsonPath("$.error").exists());
+        // 응답 JSON 바디에 "error" 필드가 존재하는지 검증
+        // 예외 메시지("대출 가능한 재고가 없습니다.")가 error 필드 등을 통해
+        // 클라이언트에게 전달되는지 확인 (단, 값 자체는 검증하지 않고 존재 여부만 확인)
     }
 }
