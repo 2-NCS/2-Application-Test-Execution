@@ -27,17 +27,17 @@ class LibraryIntegrationTest {
     @Autowired
     private BookRepository bookRepository;
 
-    @Test
-    @DisplayName("대출하면 재고가 0 이 되고 조회 API 에 반영된다")
-    void 대출_재고반영_흐름() throws Exception {
-        Book seed = new Book();
-        seed.setTitle("통합테스트 도서");
-        seed.setIsbn("INT-1");
-        seed.setTotalCopies(1);
-        seed.setAvailableCopies(1);
-        Long bookId = bookRepository.save(seed).getId();
+    @Test   //테스트
+    @DisplayName("대출하면 재고가 0 이 되고 조회 API 에 반영된다")   //테스트할 때 화면에 표시될 이름
+    void 대출_재고반영_흐름() throws Exception {    //모든 예외는 던짐
+        Book seed = new Book(); // 책 객체 생성
+        seed.setTitle("통합테스트 도서"); //책 이름 설정
+        seed.setIsbn("INT-1");  //책 식별기호 설정
+        seed.setTotalCopies(1); //책 전체 재고 설정
+        seed.setAvailableCopies(1); //책 이용가능 재고 설정
+        Long bookId = bookRepository.save(seed).getId();    //생성된 책 객체 DB에 저장후 책 고유번호 Long타입으로 변수에 저장
 
-        String lendJson = "{\"bookId\":" + bookId + ",\"member\":\"hong\"}";
+        String lendJson = "{\"bookId\":" + bookId + ",\"member\":\"hong\"}"; //책 대여 테스트를 위한 JSON형태로 이전 저장한 bookId와 hong이라는 이름으로 String 타입에 저장
         mockMvc.perform(post("/api/library/lend")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(lendJson))
