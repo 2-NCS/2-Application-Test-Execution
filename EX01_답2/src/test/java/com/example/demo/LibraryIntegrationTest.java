@@ -14,10 +14,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+//테스트 환경에서 스프링환경과 Bean 들을 주입해서 사용하기 위해 @SpringBootTest 사용 하며
+//MVC 컨트롤러를 테스트를 하기위해 MockMvc를 자동으로 생성하기 위해 @AutoConfigureMockMvc tkdud
 @SpringBootTest
 @AutoConfigureMockMvc
 class LibraryIntegrationTest {
 
+    //MockMvc, BookRepository 주입
     @Autowired
     private MockMvc mockMvc;
 
