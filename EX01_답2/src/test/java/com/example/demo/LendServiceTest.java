@@ -87,9 +87,11 @@ class LendServiceTest {
         assertNotNull(ex.getMessage());
     }
 
+    // 동일 도서 중복 반납 차단 및 재고 정상 유지 테스트 추가
     @Test
     @DisplayName("반납 예외: 두 번 반납해도 재고는 한 번만 늘고 두 번째는 BizException (D3 중복 반납)")
     void returnBook_중복반납_차단() {
+        // Given: 초기 대출 상태 및 재고가 1권인 도서 설정
         Book book = stockBook(1L, 1);
         Lend lend = new Lend();
         lend.setId(1L);
@@ -98,8 +100,10 @@ class LendServiceTest {
         when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
         when(lendRepository.save(any(Lend.class))).thenAnswer(inv -> inv.getArgument(0));
 
+        // When: 첫 번째 정상 반납 처리 (재고가 1 -> 2로 증가)
         service.returnBook(1L);
 
+        // Then: 동일한 대출 건으로 연속 반납 시 예외가 발생하는지, 재고는 여전히 2권인지 검증
         assertAll(
                 () -> assertThrows(BizException.class, () -> service.returnBook(1L)),
                 () -> assertEquals(2, book.getAvailableCopies())
