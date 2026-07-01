@@ -49,15 +49,25 @@ class BookControllerTest {
 
     @Test
     @DisplayName("대출 정상: 200 과 lendId 를 반환한다")
-    void lend_정상_200() throws Exception {
-        Lend stub = new Lend();
-        stub.setId(10L);
-        stub.setDueAt(LocalDateTime.now().plusDays(14));
+        // 테스트 목적을 설명하는 표시용 이름 (테스트 리포트에 표시됨)
+    void lend_정상_200() throws Exception { // 테스트 메서드, MockMvc 등에서 체크된 예외(IOException 등)를 던질 수 있어 throws Exception 선언
+        Lend stub = new Lend(); // 서비스 계층이 반환할 가짜(스텁) 결과 객체 생성
+        stub.setId(10L); // 스텁 객체의 대출 ID를 10으로 설정 (검증할 때 사용할 값)
+        stub.setDueAt(LocalDateTime.now().plusDays(14)); // 반납 예정일을 현재로부터 14일 뒤로 설정
+
         when(libraryService.lend(eq(1L), anyString())).thenReturn(stub);
+        // libraryService.lend() 메서드가 첫 번째 인자로 정확히 1L, 두 번째 인자로 임의의 문자열이 들어올 때
+        // 위에서 만든 stub 객체를 반환하도록 목(mock) 객체의 동작을 정의
 
         postLend("{\"bookId\":1,\"member\":\"kim\"}")
+                // 대출 요청 API를 호출하는 커스텀 헬퍼 메서드 (내부적으로 MockMvc의 POST 요청을 수행할 것으로 추정)
+                // JSON 바디로 bookId=1, member="kim" 을 전달
+
                 .andExpect(status().isOk())
+                // HTTP 응답 상태 코드가 200(OK)인지 검증
+
                 .andExpect(jsonPath("$.lendId").value(10));
+        // 응답 JSON 바디의 "lendId" 필드 값이 10인지 검증 (stub.setId(10L)과 매칭되는지 확인)
     }
 
     @Test
