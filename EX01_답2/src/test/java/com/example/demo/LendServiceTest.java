@@ -75,11 +75,14 @@ class LendServiceTest {
         assertThrows(BizException.class, () -> service.lend(1L, "kim"));
     }
 
+    // 존재하지 않는 도서 ID로 대출 시 예외 발생 테스트 추가
     @Test
     @DisplayName("대출 예외: 존재하지 않는 도서면 BizException (D2)")
     void lend_미존재도서_예외() {
+        // Given: 존재하지 않는 도서 ID(99번) 조회 시 빈 값(Optional.empty) 반환 설정
         when(bookRepository.findById(99L)).thenReturn(Optional.empty());
 
+        // When & Then: 예외가 터지는지 확인하고, 에러 메시지가 존재하는지 검증
         BizException ex = assertThrows(BizException.class, () -> service.lend(99L, "kim"));
         assertNotNull(ex.getMessage());
     }
