@@ -21,19 +21,30 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(BookController.class)
+@WebMvcTest(BookController.class) // BookController 웹 계층만 로드하는 슬라이스 테스트
 class BookControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    private MockMvc mockMvc; // 컨트롤러 요청/응답을 시뮬레이션하는 객체
 
     @MockitoBean
-    private LibraryService libraryService;
+    private LibraryService libraryService; // LibraryService를 가짜(Mock)로 대체
 
     private ResultActions postLend(String json) throws Exception {
+        // 테스트 클래스 내부에서만 사용하는 private 헬퍼 메서드
+        // 반복되는 MockMvc POST 요청 코드를 재사용하기 위해 분리
+        // 반환 타입 ResultActions: MockMvc 수행 결과에 대해 andExpect(), andDo() 등을 체이닝할 수 있게 해줌
+
         return mockMvc.perform(post("/api/library/lend")
+                // MockMvc를 통해 실제 서버 기동 없이 "/api/library/lend" 경로로 HTTP POST 요청을 시뮬레이션
+                // (스프링 시큐리티, 컨트롤러, 필터 등을 포함한 요청/응답 흐름을 애플리케이션 컨텍스트 내에서 테스트)
+
                 .contentType(MediaType.APPLICATION_JSON)
+                // 요청 헤더의 Content-Type을 "application/json"으로 설정
+                // 컨트롤러가 @RequestBody로 JSON을 파싱할 수 있도록 명시
+
                 .content(json));
+        // 요청 바디에 파라미터로 전달받은 JSON 문자열을 그대로 담아 전송
     }
 
     @Test
