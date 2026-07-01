@@ -64,11 +64,14 @@ class LendServiceTest {
         );
     }
 
+    // 대출 경계값(재고 0)일 때 대출 불가 예외 테스트 추가
     @Test
     @DisplayName("대출 경계: 재고 0 이면 대출할 수 없다 (D1 경계값)")
     void lend_재고0_예외() {
+        // Given: 재고가 0권인 도서 상태 설정
         when(bookRepository.findById(1L)).thenReturn(Optional.of(stockBook(1L, 0)));
 
+        // // When & Then: 대출 시도 시 BizException 예외가 터지는지 확인
         assertThrows(BizException.class, () -> service.lend(1L, "kim"));
     }
 
