@@ -110,17 +110,23 @@ class LendServiceTest {
         );
     }
 
+    // 반납기한 정각 및 초 단위 연체 기준 경계값 테스트 추가
     @Test
     @DisplayName("연체 경계: 반납기한 당일은 연체가 아니고 그 이후가 연체다 (D4 경계값)")
     void isOverdue_경계() {
+        // Given: 기준 반납 기한 설정
         LocalDateTime due = LocalDateTime.of(2026, 1, 15, 10, 0);
+
+        // 미반납 상태의 대출 데이터
         Lend open = new Lend();
         open.setDueAt(due);
 
+        // 기한 이틀 전에 이미 반납 완료한 대출 데이터
         Lend done = new Lend();
         done.setDueAt(due);
         done.setReturnedAt(due.minusDays(2));
 
+        // When & Then: 초 단위 경계값 기준에 따른 연체 여부(True/False) 검증
         assertAll(
                 () -> assertFalse(service.isOverdue(open, due.minusDays(1))),
                 () -> assertFalse(service.isOverdue(open, due)),
